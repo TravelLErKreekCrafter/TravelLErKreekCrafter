@@ -1,80 +1,111 @@
 #include <iostream>
-#include <Windows.h> 
-// ... (Include necessary Fortnite-specific libraries - you'll need to figure these out based on how Fortnite works)
+#include <thread>
+#include <chrono>
+#include <string>
+#include <unordered_map>
 
-bool aimbotEnabled = false;
-float aimbotSmoothness = 10.0f;
-std::string validKey = "Rev_UD8L22EPS0MKE2084RTPAM72KA8W8LOKV82TY1_M2T9E1O0O08O0M5F2G"; // Replace with your actual key
+using namespace std;
 
-// Placeholder for complex functions that would need to be implemented
-Vector3 GetEnemyPosition() { 
-    return Vector3(0, 0, 0); 
+unordered_map<string, string> loginDatabase;
+
+void displayMenu(bool isLoggedIn, bool isAdmin);
+
+void checkForUpdates() {
+    cout << "checking for updates..." << endl;
+    this_thread::sleep_for(chrono::seconds(1));
+    cout << "checking for old versions..." << endl;
+    // Simulate deleting old versions
+    this_thread::sleep_for(chrono::seconds(2));
+    cout << "loading...";
+    this_thread::sleep_for(chrono::seconds(7));
+    cout << endl;
 }
 
-float CalculateAngle(Vector3 yourCrosshairPosition, Vector3 enemyHeadPosition) { 
-    return 0.0f; 
+bool validateLogin(const string& username, const string& password) {
+    return loginDatabase.find(username) != loginDatabase.end() && loginDatabase[username] == password;
 }
 
-void SetCrosshairAngle(float angle) { 
+void adminLogin() {
+    loginDatabase["kreekcrafter"] = "William135#";
 }
 
-bool IsEnemyInFOV(Vector3 enemyPosition, float fov) { 
-    return true; 
+void loginGen() {
+    string newUsername, newPassword;
+    cout << "Enter new username: ";
+    cin >> newUsername;
+    cout << "Enter new password: ";
+    cin >> newPassword;
+    loginDatabase[newUsername] = newPassword;
+    cout << "Login generated successfully!" << endl;
 }
 
-void aimbot() {
-    float fov = 90.0f; 
-    Vector3 closestEnemyPosition = GetEnemyPosition();
-    if (IsEnemyInFOV(closestEnemyPosition, fov)) {
-        float angle = CalculateAngle(yourCrosshairPosition, closestEnemyPosition);
-        float smoothing = aimbotSmoothness;
-        float smoothedAngle = Lerp(yourCurrentAngle, angle, smoothing * deltaTime); 
-        if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) { 
-            SetCrosshairAngle(smoothedAngle);
-        } 
-    }
-}
+void showFeatures() {
+    int choice;
+    bool isLoggedIn = false, isAdmin = false;
+    string username, password;
 
-void DrawMenu() {
-    // Draw the "Rev" label at the top
-    // ... (Code to draw text)
+    while (true) {
+        displayMenu(isLoggedIn, isAdmin);
+        cin >> choice;
 
-    // Code to draw the menu, buttons, and slider
-    // ...
-}
+        if (choice == 5) { // Login
+            cout << "Enter username: ";
+            cin >> username;
+            cout << "Enter password: ";
+            cin >> password;
+            isLoggedIn = validateLogin(username, password);
+            if (isLoggedIn && username == "kreekcrafter" && password == "William135#") {
+                isAdmin = true;
+            }
+            if (isLoggedIn) {
+                cout << "Login successful!" << endl;
+            } else {
+                cout << "Invalid credentials!" << endl;
+            }
+        } else if (isLoggedIn) {
+            switch (choice) {
+                case 1:
+                    cout << "Aim feature enabled" << endl;
 
-void HandleMenuInput() {
-    // Check for key input
-    if (GetAsyncKeyState(VK_RETURN) & 0x8000) { // Check if Enter key is pressed
-        std::string enteredKey;
-        // Code to get user input (e.g., using a text box)
-        // ...
-
-        if (enteredKey == validKey) {
-            // Key is valid, enable the cheat
-aimbotEnabled = true;
-            std::cout << "Void Cheatz activated!\n";
+                    break;
+                case 2:
+                    cout << "Visuals feature enabled" << endl;
+                    break;
+                case 3:
+                    cout << "Settings feature enabled" << endl;
+                    break;
+                case 4:
+                    cout << "Updates feature enabled" << endl;
+                    break;
+                case 6:
+                    if (isAdmin) {
+                        loginGen();
+                    }
+                    break;
+                default:
+                    cout << "Invalid choice!" << endl;
+            }
         } else {
-            std::cout << "Invalid key.\n";
+            cout << "Please login to access this feature." << endl;
         }
     }
+}
 
-    // ... (Existing code for handling other menu input)
+void displayMenu(bool isLoggedIn, bool isAdmin) {
+    cout << "Select option from the menu:" << endl;
+    cout << "1. Aim" << endl;
+    cout << "2. Visuals" << endl;
+    cout << "3. Settings" << endl;
+    cout << "4. Updates" << endl;
+    cout << "5. Login" << endl;
+    if (isAdmin) {
+        cout << "6. Login Gen" << endl;
+    }
 }
 
 int main() {
-    // ... (Fortnite initialization code)
-
-    while (true) {
-        DrawMenu();
-        HandleMenuInput();
-
-        if (aimbotEnabled) {
-            aimbot(); 
-        }
-
-        Sleep(1);
-    }
-
+    adminLogin();
+    checkForUpdates();
+    showFeatures();
     return 0;
 }
